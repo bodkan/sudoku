@@ -27,18 +27,18 @@ def read_sudoku(filepath):
     return [[EMPTY if n == '0' else int(n) for n in row.strip()] for row in f]
 
 
-def values_in_row(i, sudoku):
+def row_values(i, sudoku):
     '''Get a set of already taken values in the given row.'''
     return set(n for n in sudoku[i] if n is not EMPTY)
 
 
-def values_in_column(j, sudoku):
+def col_values(j, sudoku):
     '''Get a set of already taken values in the given column.'''
     return set(sudoku[i][j] for i in range(SUDOKU_SIZE)
                             if sudoku[i][j] is not EMPTY)
 
 
-def values_in_square(i, j, sudoku):
+def square_values(i, j, sudoku):
     '''Get a set of already taken values in the square where the position
     (i,j) falls into.
     '''
