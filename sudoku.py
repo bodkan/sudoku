@@ -76,11 +76,9 @@ def next_to_fill(sudoku):
     with the list of options.
     '''
     # list to accumulate the sets of valid options at empty positions
-    options = []
-    for i in range(SUDOKU_SIZE):
-        for j in range(SUDOKU_SIZE):
-            if sudoku[i][j] is EMPTY:
-                options.append((i, j, free_values(i, j, sudoku)))
+    options = [(i, j, free_values(i, j, sudoku)) for i in range(SUDOKU_SIZE)
+                                                 for j in range(SUDOKU_SIZE)
+                                                 if sudoku[i][j] is EMPTY]
     return sorted(options, key=lambda o: len(o[2]))[0]
 
 
