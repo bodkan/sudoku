@@ -86,10 +86,18 @@ def next_to_fill(sudoku):
 
 def solve(sudoku):
     '''Recursively solve the sudoku puzzle.'''
-    if not solved(sudoku):
+    # if the solution as been reached propagate it 'upwards'
+    if solved(sudoku):
+        return sudoku
+    else:
+        # find the next best position and its valid values
         i, j, options = next_to_fill(sudoku)
         for o in options:
             sudoku[i][j] = o
-            solve(s)
-    else:
-        pretty_print(sudoku)
+            # the solution has been found => propagate it back
+            if solve(sudoku): return sudoku
+        else:
+            # none of the options lead to a solution
+            #   => remove them and backtrack
+            sudoku[i][j] = EMPTY
+            return
