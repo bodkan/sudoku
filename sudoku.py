@@ -75,10 +75,11 @@ def next_to_fill(sudoku):
     (to cut down the recursion tree) and return its coordinates along
     with the list of options.
     '''
-    # list to accumulate the sets of valid options at empty positions
+    # accumulate the set of valid options at each empty position
     options = [(i, j, free_values(i, j, sudoku)) for i in range(SUDOKU_SIZE)
                                                  for j in range(SUDOKU_SIZE)
                                                  if sudoku[i][j] is EMPTY]
+    # return the position with the smallest set of valid options
     return sorted(options, key=lambda o: len(o[2]))[0]
 
 
