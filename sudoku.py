@@ -1,3 +1,4 @@
+import argparse
 import math
 import random
 from itertools import chain
@@ -100,3 +101,14 @@ def solve(sudoku):
             #   => remove them and backtrack
             sudoku[i][j] = EMPTY
             return
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser('Solve a given sudoku puzzle and print'
+        ' the solution to the terminal')
+    parser.add_argument('--input', help='File with the input puzzle (NxN'
+        ' matrix containing numbers 0-9 with 0 indicating a missing value)',
+        required=True)
+    args = parser.parse_args()
+
+    solved_sudoku = solve(read_sudoku(args.input))
+    pretty_print(solved_sudoku)
