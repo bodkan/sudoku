@@ -1,8 +1,11 @@
 import math
+import random
+from itertools import chain
 
 EMPTY = None
 SUDOKU_SIZE = 9
 SQUARE_SIZE = int(math.sqrt(SUDOKU_SIZE))
+ALL = set(range(1, SUDOKU_SIZE + 1))
 
 
 def pretty_print(sudoku):
@@ -50,3 +53,43 @@ def square_values(i, j, sudoku):
     return set(sudoku[k][l] for k in range(upper_i, upper_i + SQUARE_SIZE)
                             for l in range(upper_j, upper_j + SQUARE_SIZE)
                             if sudoku[k][l] is not EMPTY)
+
+
+def free_values(i, j, sudoku):
+    '''Return a set of values that can be legally placed in a given
+    position of the sudoku.
+    '''
+    return ALL - (row_values(i, sudoku) |
+                  col_values(j, sudoku) |
+                  square_values(i, j, sudoku))
+
+
+def solved(sudoku):
+    '''Is the sudoku completely solved?'''
+    # the puzzle is solved if all positions are filled
+    return all(chain.from_iterable(sudoku))
+
+
+def next_to_fill(sudoku):
+    '''Find a position with the lowest number of possible valid options
+    (to cut down the recursion tree) and return its coordinates along
+    with the list of options.
+    '''
+    # list to accumulate the sets of valid options at empty positions
+    options = []
+    for i in range(SUDOKU_SIZE):
+        for j in range(SUDOKU_SIZE):
+            if sudoku[i][j] is EMPTY:
+                options.append((i, j, free_values(i, j, sudoku)))
+    return sorted(options, key=lambda o: len(o[2]))[0]
+
+
+def solve(sudoku):
+    '''Recursively solve the sudoku puzzle.'''
+    if not solved(sudoku):
+        i, j, options = next_to_fill(sudoku)
+        for o in options:
+            sudoku[i][j] = o
+            solve(s)
+    else:
+        pretty_print(sudoku)
