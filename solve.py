@@ -1,45 +1,14 @@
 import argparse
+import sys
 import math
 import random
 from itertools import chain
 
+
 EMPTY = None
 SUDOKU_SIZE = 9
-SQUARE_SIZE = int(math.sqrt(SUDOKU_SIZE))
+SQUARE_SIZE = 3
 ALL = set(range(1, SUDOKU_SIZE + 1))
-
-
-def init_empty():
-    '''Initialize an empty sudoku.'''
-    return [[EMPTY] * SUDOKU_SIZE for _ in range(SUDOKU_SIZE)]
-
-
-def generate_full():
-    '''Generate a new puzzle by solving an empty one.'''
-    s = init_empty()
-    return solve(s)
-
-
-def pretty_print(sudoku):
-    '''Print out the sudoku data structure in a readable format.'''
-    ROW_SEP = '-' * (SUDOKU_SIZE + SQUARE_SIZE + 1)
-    COL_SEP = '|'
-
-    for i, row in enumerate(sudoku):
-        # print the vertical separator
-        if i % SQUARE_SIZE == 0: print(ROW_SEP)
-
-        for j, col in enumerate(row):
-            if j % SQUARE_SIZE == 0: print(COL_SEP, end='')
-            print(' ' if not sudoku[i][j] else sudoku[i][j], end='')
-        print(COL_SEP)
-    print(ROW_SEP)
-
-
-def read_sudoku(filepath):
-    '''Read sudoku from a file in the form of list of lists'''
-    f = open(filepath, 'r')
-    return [[EMPTY if n == '0' else int(n) for n in row.strip()] for row in f]
 
 
 def row_values(i, sudoku):
@@ -118,13 +87,55 @@ def solve(sudoku):
             sudoku[i][j] = EMPTY
             return
 
+
+def init_empty():
+    '''Initialize an empty sudoku.'''
+    return [[EMPTY] * SUDOKU_SIZE for _ in range(SUDOKU_SIZE)]
+
+
+def generate():
+    '''Generate a new puzzle by solving an empty one.'''
+    s = init_empty()
+    return solve(s)
+
+
+def pretty_print(sudoku, handle=sys.stdout):
+    '''Print out the sudoku data structure in a readable format.'''
+    ROW_SEP = '-' * (SUDOKU_SIZE + SQUARE_SIZE + 1)
+    COL_SEP = '|'
+
+    for i, row in enumerate(sudoku):
+        # print the vertical separator
+        if i % SQUARE_SIZE == 0: print(ROW_SEP, file=handle)
+
+        for j, col in enumerate(row):
+            if j % SQUARE_SIZE == 0: print(COL_SEP, end='', file=handle)
+            print(' ' if not sudoku[i][j] else sudoku[i][j], end='', file=handle)
+        print(COL_SEP, file=handle)
+    print(ROW_SEP, file=handle)
+
+
+def read_sudoku(filepath):
+    '''Read sudoku from a file in the form of list of lists'''
+    f = open(filepath, 'r')
+    return [[EMPTY if n == '0' else int(n) for n in row.strip()] for row in f]
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('Solve a given sudoku puzzle and print'
-        ' the solution to the terminal')
-    parser.add_argument('--input', help='File with the input puzzle (NxN'
+        ' the solution to the terminal. Alternatively, generate a new puzzle.')
+    parser.add_argument('--solve', action='store_true')
+    parser.add_argument('--generate', action='store_true')
+    parser.add_argument('--file', help='File with with the puzzle (NxN'
         ' matrix containing numbers 0-9 with 0 indicating a missing value)',
         required=True)
     args = parser.parse_args()
 
-    solved_sudoku = solve(read_sudoku(args.input))
-    pretty_print(solved_sudoku)
+    if args.solve:
+        sudoku = solve(read_sudoku(args.file))
+        pretty_print(sudoku)
+    else:
+        sudoku = generate()
+        with open(args.file, 'w') as output:
+            pretty_print(sudoku, output)
+ 
