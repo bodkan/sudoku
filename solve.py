@@ -9,6 +9,17 @@ SQUARE_SIZE = int(math.sqrt(SUDOKU_SIZE))
 ALL = set(range(1, SUDOKU_SIZE + 1))
 
 
+def init_empty():
+    '''Initialize an empty sudoku.'''
+    return [[EMPTY] * SUDOKU_SIZE for _ in range(SUDOKU_SIZE)]
+
+
+def generate_full():
+    '''Generate a new puzzle by solving an empty one.'''
+    s = init_empty()
+    return solve(s)
+
+
 def pretty_print(sudoku):
     '''Print out the sudoku data structure in a readable format.'''
     ROW_SEP = '-' * (SUDOKU_SIZE + SQUARE_SIZE + 1)
@@ -80,8 +91,13 @@ def next_to_fill(sudoku):
     options = [(i, j, free_values(i, j, sudoku)) for i in range(SUDOKU_SIZE)
                                                  for j in range(SUDOKU_SIZE)
                                                  if sudoku[i][j] is EMPTY]
+
+    # what is the lowest number of free values at any empty position?
+    min_opts = min(len(o[2]) for o in options)
+
     # return the position with the smallest set of valid options
-    return sorted(options, key=lambda o: len(o[2]))[0]
+    # (if there are multiple options, choose a random one)
+    return random.choice([o for o in options if len(o[2]) == min_opts])
 
 
 def solve(sudoku):
