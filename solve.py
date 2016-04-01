@@ -146,21 +146,20 @@ def remove_values(sudoku, n):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('Solve a given sudoku puzzle and print'
         ' the solution to the terminal. Alternatively, generate a new puzzle.')
-    parser.add_argument('--solve', action='store_true')
-    parser.add_argument('--generate', action='store_true')
+    parser.add_argument('--solve', help='File with a puzzle to solve',
+                        default=None)
+    parser.add_argument('--generate', help='Output file for generated puzzle',
+                        default=None)
     parser.add_argument('--missing', help='Number of fields to leave empty',
                         type=check_range, default=0)
-    parser.add_argument('--file', help='File with with the puzzle (NxN'
-        ' matrix containing numbers 0-9 with 0 indicating a missing value)',
-        required=True)
     args = parser.parse_args()
 
     if args.solve:
-        sudoku = solve(read_sudoku(args.file))
+        sudoku = solve(read_sudoku(args.solve))
         pretty_print(sudoku)
-    else:
+    elif args.generate:
         sudoku = generate()
         sudoku = remove_values(sudoku, args.missing)
-        with open(args.file, 'w') as f:
+        with open(args.generate, 'w') as f:
             pretty_print(sudoku, f)
  
