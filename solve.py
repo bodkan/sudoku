@@ -121,11 +121,35 @@ def read_sudoku(filepath):
     return [[EMPTY if n == '0' else int(n) for n in row.strip()] for row in f]
 
 
+def check_range(n):
+    '''Check if a given number falls in [0, SUDOKU_SIZE].'''
+    if 0 <= int(n) <= SUDOKU_SIZE ** 2:
+        return int(n)
+    else:
+        raise argparse.ArgumentTypeError('Has to be number between 0 and ' +
+                                         str(SUDOKU_SIZE ** 2))
+
+def remove_values(sudoku, n):
+    '''Remove n values from a solved sudoku.'''
+    removed = 0
+    while removed < n:
+        i = random.randint(0, SUDOKU_SIZE - 1)
+        j = random.randint(0, SUDOKU_SIZE - 1)
+
+        if sudoku[i][j] is not EMPTY:
+            sudoku[i][j] = EMPTY
+            removed += 1
+
+    return sudoku
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('Solve a given sudoku puzzle and print'
         ' the solution to the terminal. Alternatively, generate a new puzzle.')
     parser.add_argument('--solve', action='store_true')
     parser.add_argument('--generate', action='store_true')
+    parser.add_argument('--missing', help='Number of fields to leave empty',
+                        type=check_range, default=0)
     parser.add_argument('--file', help='File with with the puzzle (NxN'
         ' matrix containing numbers 0-9 with 0 indicating a missing value)',
         required=True)
@@ -136,6 +160,7 @@ if __name__ == '__main__':
         pretty_print(sudoku)
     else:
         sudoku = generate()
-        with open(args.file, 'w') as output:
-            pretty_print(sudoku, output)
+        sudoku = remove_values(sudoku, args.missing)
+        with open(args.file, 'w') as f:
+            pretty_print(sudoku, f)
  
